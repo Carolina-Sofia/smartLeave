@@ -1,0 +1,72 @@
+[
+  {
+    "holiday": "Ano Novo",
+    "date": "2025-01-01",
+    "weekday": "quarta-feira"
+  },
+  {
+    "holiday": "Sexta-feira Santa",
+    "date": "2025-04-18",
+    "weekday": "sexta-feira"
+  },
+  {
+    "holiday": "Páscoa",
+    "date": "2025-04-20",
+    "weekday": "domingo"
+  },
+  {
+    "holiday": "Dia da Liberdade",
+    "date": "2025-04-25",
+    "weekday": "sexta-feira"
+  },
+  {
+    "holiday": "Dia do Trabalhador",
+    "date": "2025-05-01",
+    "weekday": "quinta-feira"
+  },
+  {
+    "holiday": "Dia de Portugal",
+    "date": "2025-06-10",
+    "weekday": "terça-feira"
+  },
+  {
+    "holiday": "Dia de Santo António",
+    "date": "2025-06-13",
+    "weekday": "sexta-feira"
+  },
+  {
+    "holiday": "Corpo de Deus",
+    "date": "2025-06-19",
+    "weekday": "quinta-feira"
+  },
+  {
+    "holiday": "Dia da Assunção de Nossa Senhora",
+    "date": "2025-08-15",
+    "weekday": "sexta-feira"
+  },
+  {
+    "holiday": "Dia da Implantação da República",
+    "date": "2025-10-05",
+    "weekday": "domingo"
+  },
+  {
+    "holiday": "Dia de Todos os Santos",
+    "date": "2025-11-01",
+    "weekday": "sábado"
+  },
+  {
+    "holiday": "Dia da Restauração da Independência",
+    "date": "2025-12-01",
+    "weekday": "segunda-feira"
+  },
+  {
+    "holiday": "Dia da Imaculada Conceição",
+    "date": "2025-12-08",
+    "weekday": "segunda-feira"
+  },
+  {
+    "holiday": "Natal",
+    "date": "2025-12-25",
+    "weekday": "quinta-feira"
+  }
+]
