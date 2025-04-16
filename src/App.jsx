@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import data from "./assets/holiday.json";
+import ReactDOM from "react-dom/client";
 
 // Gives an array of saturdays and sundays from today to a specific date
 function getWeekends() {
@@ -60,6 +61,8 @@ function App() {
     setInputValue(event.target.value);
   };
 
+  const [vacationRecs, setVacationRecs] = useState([]);
+
   function handleCalculate() {
     const [saturdays, sundays] = getWeekends();
     const holidaysRaw = getHolidays();
@@ -103,6 +106,7 @@ function App() {
       today.setDate(today.getDate() + 1);
     }
 
+    setVacationRecs(bestDays);
     console.log("Recommended vacation days:", bestDays);
   }
 
@@ -128,6 +132,14 @@ function App() {
         >
           Submit
         </button>
+      </div>
+
+      <div>
+        <ul>
+          {vacationRecs.map((day, index) => (
+            <li key={index}>{day}</li>
+          ))}
+        </ul>
       </div>
     </>
   );
