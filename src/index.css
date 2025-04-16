@@ -66,6 +66,27 @@ button:focus-visible {
   max-width: 100px;
 }
 
+.legend {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.legend-square {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.color-legend {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 2px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

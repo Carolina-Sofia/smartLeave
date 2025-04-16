@@ -12,7 +12,12 @@ function YearCalendar({
     { length: 12 },
     (_, index) => new Date(year, index)
   );
-  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatDate = (date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
+
   const start = new Date(startDate);
   const end = new Date(endDate);
 
@@ -49,7 +54,10 @@ function YearCalendar({
             size="xs"
             getDayProps={(date) => {
               const dateStr = formatDate(date);
+              const isSat = date.getDay() === 6;
+              const isSun = date.getDay() === 0;
 
+              /* out‑of‑range days */
               if (date < start || date > end) {
                 return {
                   style: {
@@ -61,21 +69,23 @@ function YearCalendar({
                 };
               }
 
+              /* vacation‑recommendation days */
               if (vacationDays.includes(dateStr)) {
                 return {
                   style: {
-                    backgroundColor: "#ffcccc",
-                    color: "#b30000",
+                    backgroundColor: "#ffc4e1", // soft pink
+                    color: "#b3006b",
                     fontWeight: 700,
                     borderRadius: "4px",
                   },
                 };
               }
 
+              /* public holidays */
               if (holidayDays.includes(dateStr)) {
                 return {
                   style: {
-                    backgroundColor: "#fff3cd",
+                    backgroundColor: "#fff4b5", // pastel yellow
                     color: "#856404",
                     fontWeight: 600,
                     borderRadius: "4px",
@@ -83,6 +93,18 @@ function YearCalendar({
                 };
               }
 
+              /* weekends */
+              if (isSat || isSun) {
+                return {
+                  style: {
+                    backgroundColor: "#b0d4ff", // two blues
+                    color: "#004d99",
+                    fontWeight: 500,
+                  },
+                };
+              }
+
+              /* plain weekdays */
               return {};
             }}
           />
