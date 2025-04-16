@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import data from "./assets/holiday.json";
-import { Calendar } from "@mantine/dates";
+import YearCalendar from "./components/YearCalendar";
 
 // Gives an array of saturdays and sundays from today to a specific date
 function getWeekends(startDate, endDate) {
@@ -45,6 +45,7 @@ function App() {
   const [endDate, setEndDate] = useState(
     formatDate(new Date(new Date().getFullYear(), 11, 31))
   );
+  const currentYear = new Date().getFullYear();
 
   const handleInputChange = (event) => {
     let value = parseInt(event.target.value, 10);
@@ -124,67 +125,76 @@ function App() {
 
   return (
     <>
-      <h1 className="pb-1">Smart Leave</h1>
-      <p className="pb-5">We do the math. You book the flights.</p>
+      <div className="page pt-4 px-5">
+        {/* Start date */}
+        <div className="form col-3">
+          <h1 className="pb-1">Smart Leave</h1>
+          <p className="pb-5">We do the math. You book the flights.</p>
+          <div className="input-group mb-3">
+            <select class="form-select" aria-label="Default select example">
+              <option selected>Select Country</option>
+              <option value="1">Portugal</option>
+            </select>
+          </div>
+          <div className="input-group mb-3">
+            <span className="input-group-text">From:</span>
+            <input
+              type="date"
+              className="form-control"
+              placeholder="16/04/2025"
+              aria-label="Start date"
+              aria-describedby="button-addon2"
+              onChange={handleDateStartChange}
+              value={startDate}
+            />
+          </div>
 
-      {/* Start date */}
-      <div className="input-group mb-3">
-        <span className="input-group-text">From:</span>
-        <input
-          type="date"
-          className="form-control"
-          placeholder="16/04/2025"
-          aria-label="Start date"
-          aria-describedby="button-addon2"
-          onChange={handleDateStartChange}
-          value={startDate}
-        />
-      </div>
+          {/* End date */}
+          <div className="input-group mb-3">
+            <span className="input-group-text">To:</span>
+            <input
+              type="date"
+              className="form-control"
+              placeholder="Number of vacation days"
+              aria-label="Start date"
+              aria-describedby="button-addon2"
+              onChange={handleDateEndChange}
+              value={endDate}
+            />
+          </div>
 
-      {/* End date */}
-      <div className="input-group mb-3">
-        <span className="input-group-text">To:</span>
-        <input
-          type="date"
-          className="form-control"
-          placeholder="Number of vacation days"
-          aria-label="Start date"
-          aria-describedby="button-addon2"
-          onChange={handleDateEndChange}
-          value={endDate}
-        />
-      </div>
+          {/* Number of vacation days */}
+          <p>Number of vacations days:</p>
+          <div className="input-group mb-3">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Number of vacation days"
+              aria-label="Number of vacation days"
+              aria-describedby="button-addon2"
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+            <button
+              className="btn btn-outline-secondary"
+              type="submit"
+              id="button-addon2"
+              onClick={handleCalculate}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
 
-      {/* Number of vacation days */}
-      <p>Number of vacations days:</p>
-      <div className="input-group mb-3">
-        <input
-          type="number"
-          className="form-control"
-          placeholder="Number of vacation days"
-          aria-label="Number of vacation days"
-          aria-describedby="button-addon2"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-        <button
-          className="btn btn-outline-secondary"
-          type="submit"
-          id="button-addon2"
-          onClick={handleCalculate}
-        >
-          Submit
-        </button>
+        <div className="calendar">
+          <ul>
+            {vacationRecs.map((day, index) => (
+              <li key={index}>{formatDisplayDate(day)}</li>
+            ))}
+          </ul>
+        </div>
+        <YearCalendar year={currentYear} />
       </div>
-
-      <div>
-        <ul>
-          {vacationRecs.map((day, index) => (
-            <li key={index}>{formatDisplayDate(day)}</li>
-          ))}
-        </ul>
-      </div>
-      <Calendar />
     </>
   );
 }
