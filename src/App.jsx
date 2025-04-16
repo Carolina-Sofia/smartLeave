@@ -33,13 +33,23 @@ function getWeekends(startDate, endDate) {
   return [saturdays, sundays];
 }
 
+function parseDateString(dateStr) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
+}
+
 // Gets holidays from holiday.json and tells how many are on weekdays
 function getHolidays() {
-  return data.map((holiday) => holiday.date);
+  return data.map((holiday) => parseDateString(holiday.date));
 }
 
 function App() {
-  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatDate = (date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
+
   const [inputValue, setInputValue] = useState("");
   const [startDate, setStartDate] = useState(formatDate(new Date()));
   const [endDate, setEndDate] = useState(
@@ -86,7 +96,7 @@ function App() {
     const holidaysRaw = getHolidays();
     const vacationDays = parseInt(inputValue);
 
-    const holidaySet = new Set(holidaysRaw.map((d) => formatDate(new Date(d))));
+    const holidaySet = new Set(holidaysRaw.map(formatDate));
     const saturdaySet = new Set(saturdays.map(formatDate));
     const sundaySet = new Set(sundays.map(formatDate));
 
@@ -118,7 +128,13 @@ function App() {
         bestDays.push(currentStr);
         daysLeft--;
       }
-
+      console.log(
+        "HolidaySet contains prevStr?",
+        holidaySet.has(prevStr),
+        prevStr
+      );
+      console.log("Checking:", currentStr, "prev:", prevStr, "next:", nextStr);
+      console.log("Is bridge day?", isBridgeDay);
       // próximo dia
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -127,20 +143,17 @@ function App() {
     console.log("Recommended vacation days:", bestDays);
   }
 
-  const formattedVacationDays = vacationRecs.map(
-    (d) => new Date(d).toISOString().split("T")[0]
-  );
+  const formattedVacationDays = vacationRecs;
 
-  const formattedHolidayDays = getHolidays().map(
-    (d) => new Date(d).toISOString().split("T")[0]
-  );
+  const formattedHolidayDays = getHolidays().map((d) => formatDate(d));
+
   const [selectedCountry, setSelectedCountry] = useState("");
 
   return (
     <>
       <div className="page pt-4 px-5">
         {/* Left side */}
-        <div className="form col-3">
+        <div className="form col-3 pt-3">
           <h1 className="pb-1">Smart Leave</h1>
           <p className="pb-5">We do the math. You book the flights.</p>
           <div className="input-group mb-3">
@@ -167,7 +180,6 @@ function App() {
               value={startDate}
             />
           </div>
-
           {/* End date */}
           <div className="input-group mb-3">
             <span className="input-group-text">To:</span>
@@ -181,7 +193,6 @@ function App() {
               value={endDate}
             />
           </div>
-
           {/* Number of vacation days */}
           <p>Number of vacations days:</p>
           <div className="input-group mb-3">
@@ -202,6 +213,36 @@ function App() {
             >
               Submit
             </button>
+          </div>
+          <div className="legend pt-3">
+            <div className="legend-square">
+              <span
+                className="color-legend"
+                style={{ background: "#ffc4e1" }}
+              ></span>
+              Vacation Pick
+            </div>
+            <div className="legend-square">
+              <span
+                className="color-legend"
+                style={{ background: "#fff4b5" }}
+              ></span>
+              Public holiday
+            </div>
+            <div className="legend-square">
+              <span
+                className="color-legend"
+                style={{ background: "#b0d4ff" }}
+              ></span>
+              Weekends
+            </div>
+            <div className="legend-square">
+              <span
+                className="color-legend"
+                style={{ background: "#e0e0e0" }}
+              ></span>
+              Out of range
+            </div>
           </div>
         </div>
 
