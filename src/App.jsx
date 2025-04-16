@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import data from "./assets/holiday.json";
 
+// Gives an array of saturdays and sundays from today to a specific date
 function getWeekends() {
   const today = new Date();
   const end = new Date("2025-12-31");
@@ -28,9 +29,10 @@ function getWeekends() {
   // console.log("Saturdays:", saturdays);
   // console.log("Sundays:", sundays);
 
-  return;
+  return [saturdays, sundays];
 }
 
+// Gets holidays from holiday.json and tells how many are on weekdays
 function getHolidays() {
   const holidays = data.map((holiday) => holiday.date);
   let sumHolidays = holidays.length;
@@ -45,13 +47,65 @@ function getHolidays() {
       sumHolidays -= 1;
     }
   }
-  console.log(holidays);
+
   console.log("Number of weekday holidays", sumHolidays);
+
+  return holidays;
 }
 
 function App() {
-  getWeekends();
-  getHolidays();
+  const [inputValue, setInputValue] = useState("");
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  function handleCalculate() {
+    const [saturdays, sundays] = getWeekends();
+    const holidaysRaw = getHolidays();
+    const vacationDays = parseInt(inputValue);
+
+    const formatDate = (date) => date.toISOString().split("T")[0];
+
+    const holidaySet = new Set(holidaysRaw.map((d) => formatDate(new Date(d))));
+    const saturdaySet = new Set(saturdays.map(formatDate));
+    const sundaySet = new Set(sundays.map(formatDate));
+
+    let today = new Date();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const end = new Date("2025-12-31");
+    let daysLeft = vacationDays;
+    let bestDays = [];
+
+    while (today <= end && daysLeft > 0) {
+      const currentStr = formatDate(today);
+
+      const prevDay = new Date(today.getTime() - oneDayMs);
+      const nextDay = new Date(today.getTime() + oneDayMs);
+      const prevStr = formatDate(prevDay);
+      const nextStr = formatDate(nextDay);
+
+      const isBridgeDay =
+        // sexta no meio de feriado e fim de semana
+        ((today.getDay() === 5 && holidaySet.has(prevStr)) ||
+          // segunda no meio de feriado e fim de semana
+          (today.getDay() === 1 && holidaySet.has(nextStr))) &&
+        !holidaySet.has(currentStr) &&
+        !saturdaySet.has(currentStr) &&
+        !sundaySet.has(currentStr);
+
+      if (isBridgeDay) {
+        bestDays.push(currentStr);
+        daysLeft--;
+      }
+
+      // próximo dia
+      today.setDate(today.getDate() + 1);
+    }
+
+    console.log("Recommended vacation days:", bestDays);
+  }
+
   return (
     <>
       <h1 className="pb-1">Smart Leave</h1>
@@ -63,11 +117,14 @@ function App() {
           placeholder="Number of vacation days"
           aria-label="Number of vacation days"
           aria-describedby="button-addon2"
+          value={inputValue}
+          onChange={handleInputChange}
         />
         <button
           className="btn btn-outline-secondary"
-          type="button"
+          type="submit"
           id="button-addon2"
+          onClick={handleCalculate}
         >
           Submit
         </button>
