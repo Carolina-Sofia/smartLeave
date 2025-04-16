@@ -1,12 +1,12 @@
 import { useState } from "react";
 import "./App.css";
 import data from "./assets/holiday.json";
-import ReactDOM from "react-dom/client";
+import { Calendar } from "@mantine/dates";
 
 // Gives an array of saturdays and sundays from today to a specific date
-function getWeekends() {
-  const today = new Date();
-  const end = new Date("2025-12-31");
+function getWeekends(startDate, endDate) {
+  const today = new Date(startDate);
+  const end = new Date(endDate);
   const saturdays = [];
   const sundays = [];
 
@@ -35,64 +35,76 @@ function getWeekends() {
 
 // Gets holidays from holiday.json and tells how many are on weekdays
 function getHolidays() {
-  const holidays = data.map((holiday) => holiday.date);
-  let sumHolidays = holidays.length;
-
-  // This substracts the weekends, so technicall we get 11 days off in portugal this year
-  for (let i = 0; i < holidays.length; i++) {
-    const holiday = new Date(holidays[i]);
-    const holidayDay = holiday.getDay();
-    if (holidayDay === 0) {
-      sumHolidays -= 1;
-    } else if (holidayDay === 6) {
-      sumHolidays -= 1;
-    }
-  }
-
-  console.log("Number of weekday holidays", sumHolidays);
-
-  return holidays;
+  return data.map((holiday) => holiday.date);
 }
 
 function App() {
+  const formatDate = (date) => date.toISOString().split("T")[0];
   const [inputValue, setInputValue] = useState("");
+  const [startDate, setStartDate] = useState(formatDate(new Date()));
+  const [endDate, setEndDate] = useState(
+    formatDate(new Date(new Date().getFullYear(), 11, 31))
+  );
 
   const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+    let value = parseInt(event.target.value, 10);
+
+    if (isNaN(value)) {
+      setInputValue("");
+      return;
+    }
+
+    if (value < 1) value = 1;
+    if (value > 365) value = 365;
+
+    setInputValue(value.toString());
+  };
+
+  const handleDateStartChange = (event) => {
+    setStartDate(event.target.value);
+  };
+
+  const handleDateEndChange = (event) => {
+    setEndDate(event.target.value);
   };
 
   const [vacationRecs, setVacationRecs] = useState([]);
 
+  function formatDisplayDate(dateStr) {
+    const date = new Date(dateStr);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
+  }
+
   function handleCalculate() {
-    const [saturdays, sundays] = getWeekends();
+    const [saturdays, sundays] = getWeekends(startDate, endDate);
     const holidaysRaw = getHolidays();
     const vacationDays = parseInt(inputValue);
-
-    const formatDate = (date) => date.toISOString().split("T")[0];
 
     const holidaySet = new Set(holidaysRaw.map((d) => formatDate(new Date(d))));
     const saturdaySet = new Set(saturdays.map(formatDate));
     const sundaySet = new Set(sundays.map(formatDate));
 
-    let today = new Date();
+    let currentDate = new Date(startDate);
+    const end = new Date(endDate);
+
     const oneDayMs = 24 * 60 * 60 * 1000;
-    const end = new Date("2025-12-31");
     let daysLeft = vacationDays;
     let bestDays = [];
 
-    while (today <= end && daysLeft > 0) {
-      const currentStr = formatDate(today);
+    while (currentDate <= end && daysLeft > 0) {
+      const currentStr = formatDate(currentDate);
 
-      const prevDay = new Date(today.getTime() - oneDayMs);
-      const nextDay = new Date(today.getTime() + oneDayMs);
+      const prevDay = new Date(currentDate.getTime() - oneDayMs);
+      const nextDay = new Date(currentDate.getTime() + oneDayMs);
       const prevStr = formatDate(prevDay);
       const nextStr = formatDate(nextDay);
 
       const isBridgeDay =
         // sexta no meio de feriado e fim de semana
-        ((today.getDay() === 5 && holidaySet.has(prevStr)) ||
+        ((currentDate.getDay() === 5 && holidaySet.has(prevStr)) ||
           // segunda no meio de feriado e fim de semana
-          (today.getDay() === 1 && holidaySet.has(nextStr))) &&
+          (currentDate.getDay() === 1 && holidaySet.has(nextStr))) &&
         !holidaySet.has(currentStr) &&
         !saturdaySet.has(currentStr) &&
         !sundaySet.has(currentStr);
@@ -103,7 +115,7 @@ function App() {
       }
 
       // próximo dia
-      today.setDate(today.getDate() + 1);
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
     setVacationRecs(bestDays);
@@ -114,9 +126,40 @@ function App() {
     <>
       <h1 className="pb-1">Smart Leave</h1>
       <p className="pb-5">We do the math. You book the flights.</p>
+
+      {/* Start date */}
+      <div className="input-group mb-3">
+        <span className="input-group-text">From:</span>
+        <input
+          type="date"
+          className="form-control"
+          placeholder="16/04/2025"
+          aria-label="Start date"
+          aria-describedby="button-addon2"
+          onChange={handleDateStartChange}
+          value={startDate}
+        />
+      </div>
+
+      {/* End date */}
+      <div className="input-group mb-3">
+        <span className="input-group-text">To:</span>
+        <input
+          type="date"
+          className="form-control"
+          placeholder="Number of vacation days"
+          aria-label="Start date"
+          aria-describedby="button-addon2"
+          onChange={handleDateEndChange}
+          value={endDate}
+        />
+      </div>
+
+      {/* Number of vacation days */}
+      <p>Number of vacations days:</p>
       <div className="input-group mb-3">
         <input
-          type="text"
+          type="number"
           className="form-control"
           placeholder="Number of vacation days"
           aria-label="Number of vacation days"
@@ -137,10 +180,11 @@ function App() {
       <div>
         <ul>
           {vacationRecs.map((day, index) => (
-            <li key={index}>{day}</li>
+            <li key={index}>{formatDisplayDate(day)}</li>
           ))}
         </ul>
       </div>
+      <Calendar />
     </>
   );
 }
