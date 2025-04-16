@@ -58,6 +58,8 @@ button:focus-visible {
   width: 100%;
   max-width: none;
   display: flex;
+  gap: 2rem;
+  padding: 2rem;
 }
 
 .calendar {

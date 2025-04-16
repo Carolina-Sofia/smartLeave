@@ -16,3 +16,26 @@
   padding: 0 !important;
   margin: 0 !important;
 }
+
+.disabled-day {
+  font-size: 14px !important;
+  background-color: #e0e0e0 !important;
+  color: #999 !important;
+  opacity: 0.6;
+}
+
+.vacation-day {
+  font-size: 14px !important;
+  background-color: #ffcccc !important;
+  color: #b30000 !important;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.holiday-day {
+  font-size: 14px !important;
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  font-weight: 600;
+  border-radius: 4px;
+}

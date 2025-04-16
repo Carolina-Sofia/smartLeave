@@ -45,7 +45,11 @@ function App() {
   const [endDate, setEndDate] = useState(
     formatDate(new Date(new Date().getFullYear(), 11, 31))
   );
-  const currentYear = new Date().getFullYear();
+
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  const handlePrevYear = () => setCurrentYear((prev) => prev - 1);
+  const handleNextYear = () => setCurrentYear((prev) => prev + 1);
 
   const handleInputChange = (event) => {
     let value = parseInt(event.target.value, 10);
@@ -123,19 +127,34 @@ function App() {
     console.log("Recommended vacation days:", bestDays);
   }
 
+  const formattedVacationDays = vacationRecs.map(
+    (d) => new Date(d).toISOString().split("T")[0]
+  );
+
+  const formattedHolidayDays = getHolidays().map(
+    (d) => new Date(d).toISOString().split("T")[0]
+  );
+  const [selectedCountry, setSelectedCountry] = useState("");
+
   return (
     <>
       <div className="page pt-4 px-5">
-        {/* Start date */}
+        {/* Left side */}
         <div className="form col-3">
           <h1 className="pb-1">Smart Leave</h1>
           <p className="pb-5">We do the math. You book the flights.</p>
           <div className="input-group mb-3">
-            <select class="form-select" aria-label="Default select example">
-              <option selected>Select Country</option>
-              <option value="1">Portugal</option>
+            <select
+              className="form-select"
+              aria-label="Country select"
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+            >
+              <option value="">Select Country</option>
+              <option value="portugal">Portugal</option>
             </select>
           </div>
+          {/* Start date */}
           <div className="input-group mb-3">
             <span className="input-group-text">From:</span>
             <input
@@ -186,14 +205,40 @@ function App() {
           </div>
         </div>
 
-        <div className="calendar">
-          <ul>
-            {vacationRecs.map((day, index) => (
-              <li key={index}>{formatDisplayDate(day)}</li>
-            ))}
-          </ul>
+        {/* Right side */}
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <button
+              onClick={handlePrevYear}
+              className="btn btn-outline-secondary"
+            >
+              ←
+            </button>
+            <h2 className="m-0 fs-3">{currentYear}</h2>
+            <button
+              onClick={handleNextYear}
+              className="btn btn-outline-secondary"
+            >
+              →
+            </button>
+          </div>
+
+          <YearCalendar
+            year={currentYear}
+            startDate={startDate}
+            endDate={endDate}
+            vacationDays={formattedVacationDays}
+            holidayDays={formattedHolidayDays}
+          />
         </div>
-        <YearCalendar year={currentYear} />
       </div>
     </>
   );
