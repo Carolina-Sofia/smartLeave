@@ -56,7 +56,7 @@ button:focus-visible {
 
 .page {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
   display: flex;
   gap: 2rem;
   padding: 2rem;
