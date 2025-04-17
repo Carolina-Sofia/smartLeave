@@ -220,7 +220,14 @@ function App() {
                 className="color-legend"
                 style={{ background: "#ffc4e1" }}
               ></span>
-              Vacation Pick
+              Recommended Vacation Pick
+            </div>
+            <div className="legend-square">
+              <span
+                className="color-legend"
+                style={{ background: "#fce3f0" }}
+              ></span>
+              Self-selected Vacation Pick
             </div>
             <div className="legend-square">
               <span
