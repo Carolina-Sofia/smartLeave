@@ -148,6 +148,7 @@ function App() {
   const formattedHolidayDays = getHolidays().map((d) => formatDate(d));
 
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [manuallySelectedDays, setManuallySelectedDays] = useState([]);
 
   return (
     <>
@@ -156,7 +157,8 @@ function App() {
         <div className="form col-3 pt-3">
           <h1 className="pb-1">Smart Leave</h1>
           <p className="pb-5">We do the math. You book the flights.</p>
-          <div className="input-group mb-3">
+          {/* Dar para selecionar o país - neste momento só tem feriados de portugal */}
+          {/* <div className="input-group mb-3">
             <select
               className="form-select"
               aria-label="Country select"
@@ -166,7 +168,7 @@ function App() {
               <option value="">Select Country</option>
               <option value="portugal">Portugal</option>
             </select>
-          </div>
+          </div> */}
           {/* Start date */}
           <div className="input-group mb-3">
             <span className="input-group-text">From:</span>
@@ -214,6 +216,14 @@ function App() {
               Submit
             </button>
           </div>
+          <p>
+            {inputValue && (
+              <p>
+                Days left to select manually:{" "}
+                {parseInt(inputValue) - manuallySelectedDays.length}
+              </p>
+            )}
+          </p>
           <div className="legend pt-3">
             <div className="legend-square">
               <span
@@ -285,6 +295,9 @@ function App() {
             endDate={endDate}
             vacationDays={formattedVacationDays}
             holidayDays={formattedHolidayDays}
+            manuallySelectedDays={manuallySelectedDays}
+            setManuallySelectedDays={setManuallySelectedDays}
+            maxManualDays={parseInt(inputValue) || 0}
           />
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { Month } from "@mantine/dates";
 import { SimpleGrid, Paper, Title } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
-import { useState } from "react";
+import { HoverCard, Button, Text, Group } from "@mantine/core";
 
 function YearCalendar({
   year,
@@ -9,6 +8,9 @@ function YearCalendar({
   endDate,
   vacationDays = [],
   holidayDays = [],
+  manuallySelectedDays,
+  setManuallySelectedDays,
+  maxManualDays,
 }) {
   const months = Array.from(
     { length: 12 },
@@ -22,7 +24,6 @@ function YearCalendar({
 
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const [manuallySelectedDays, setManuallySelectedDays] = useState([]);
 
   return (
     <SimpleGrid
@@ -90,6 +91,10 @@ function YearCalendar({
                 fontWeight = 500;
               }
 
+              const isAtLimit =
+                manuallySelectedDays.length >= maxManualDays &&
+                !manuallySelectedDays.includes(dateStr);
+
               return {
                 style: {
                   backgroundColor,
@@ -97,55 +102,23 @@ function YearCalendar({
                   fontWeight,
                   borderRadius: "4px",
                   cursor: "pointer",
+                  cursor: isAtLimit ? "not-allowed" : "pointer",
                 },
                 onClick: () => {
-                  setManuallySelectedDays((prev) =>
-                    prev.includes(dateStr)
-                      ? prev.filter((d) => d !== dateStr)
-                      : [...prev, dateStr]
-                  );
+                  setManuallySelectedDays((prev) => {
+                    if (prev.includes(dateStr)) {
+                      // deselect
+                      return prev.filter((d) => d !== dateStr);
+                    } else if (prev.length < maxManualDays) {
+                      // select only if limit not reached
+                      return [...prev, dateStr];
+                    } else {
+                      return prev; // do nothing if at max
+                    }
+                  });
                 },
               };
             }}
-
-            //   /* vacation‑recommendation days */
-            //   if (vacationDays.includes(dateStr)) {
-            //     return {
-            //       style: {
-            //         backgroundColor: "#ffc4e1", // soft pink
-            //         color: "#b3006b",
-            //         fontWeight: 700,
-            //         borderRadius: "4px",
-            //       },
-            //     };
-            //   }
-
-            //   /* public holidays */
-            //   if (holidayDays.includes(dateStr)) {
-            //     return {
-            //       style: {
-            //         backgroundColor: "#fff4b5", // pastel yellow
-            //         color: "#856404",
-            //         fontWeight: 600,
-            //         borderRadius: "4px",
-            //       },
-            //     };
-            //   }
-
-            //   /* weekends */
-            //   if (isSat || isSun) {
-            //     return {
-            //       style: {
-            //         backgroundColor: "#b0d4ff", // two blues
-            //         color: "#004d99",
-            //         fontWeight: 500,
-            //       },
-            //     };
-            //   }
-
-            //   /* plain weekdays */
-            //   return {};
-            // }}
           />
         </Paper>
       ))}
