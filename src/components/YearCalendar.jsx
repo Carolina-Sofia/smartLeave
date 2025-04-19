@@ -101,7 +101,6 @@ function YearCalendar({
                   color,
                   fontWeight,
                   borderRadius: "4px",
-                  cursor: "pointer",
                   cursor: isAtLimit ? "not-allowed" : "pointer",
                 },
                 onClick: () => {

@@ -9,12 +9,10 @@ function getWeekends(startDate, endDate) {
   const end = new Date(endDate);
   const saturdays = [];
   const sundays = [];
-
   // saturdays are 6, sundays are 0 - this is getting the first saturday
   while (today.getDay() !== 6) {
     today.setDate(today.getDate() + 1);
   }
-
   // jumping 7 to 7 days to collect the saturdays and sundays
   while (today <= end) {
     const saturday = new Date(today);
@@ -25,22 +23,51 @@ function getWeekends(startDate, endDate) {
     sundays.push(sunday);
     today.setDate(today.getDate() + 7);
   }
-
   // console.log("Today", today);
   // console.log("Saturdays:", saturdays);
   // console.log("Sundays:", sundays);
-
   return [saturdays, sundays];
 }
 
+// Format the date
 function parseDateString(dateStr) {
   const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day); // month is 0-indexed
 }
 
-// Gets holidays from holiday.json and tells how many are on weekdays
-function getHolidays() {
-  return data.map((holiday) => parseDateString(holiday.date));
+// Gets holidays from holiday.json that are within the date range
+function getHolidays(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  return data
+    .map((holiday) => parseDateString(holiday.date))
+    .filter((date) => date >= start && date <= end);
+}
+
+// Sums the total of free days in the range = weekends + holidays
+function getFreeDays(startDate, endDate) {
+  const today = new Date(startDate);
+  const end = new Date(endDate);
+  const holidays = getHolidays(startDate, endDate);
+  const [saturdays, sundays] = getWeekends(startDate, endDate);
+
+  // Calcular número de dias feriados de semana
+  let sumWeekdayHolidays = holidays.length;
+
+  // This substracts the weekends so we get weekday holidays
+  for (let i = 0; i < holidays.length; i++) {
+    const holiday = new Date(holidays[i]);
+    const holidayDay = holiday.getDay();
+    if (holidayDay === 0) {
+      sumWeekdayHolidays -= 1;
+    } else if (holidayDay === 6) {
+      sumWeekdayHolidays -= 1;
+    }
+  }
+
+  console.log(holidays);
+  console.log("Number of weekday holidays", sumHolidays);
 }
 
 function App() {
@@ -85,15 +112,13 @@ function App() {
 
   const [vacationRecs, setVacationRecs] = useState([]);
 
-  function formatDisplayDate(dateStr) {
-    const date = new Date(dateStr);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("en-US", options);
-  }
+  //I use useState so that react can track if this is changed and render this
+  // This needs to be declared outside of functions
+  const [restDays, setRestDays] = useState(0);
 
   function handleCalculate() {
     const [saturdays, sundays] = getWeekends(startDate, endDate);
-    const holidaysRaw = getHolidays();
+    const holidaysRaw = getHolidays(startDate, endDate);
     const vacationDays = parseInt(inputValue);
 
     const holidaySet = new Set(holidaysRaw.map(formatDate));
@@ -128,13 +153,7 @@ function App() {
         bestDays.push(currentStr);
         daysLeft--;
       }
-      console.log(
-        "HolidaySet contains prevStr?",
-        holidaySet.has(prevStr),
-        prevStr
-      );
-      console.log("Checking:", currentStr, "prev:", prevStr, "next:", nextStr);
-      console.log("Is bridge day?", isBridgeDay);
+
       // próximo dia
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -145,7 +164,9 @@ function App() {
 
   const formattedVacationDays = vacationRecs;
 
-  const formattedHolidayDays = getHolidays().map((d) => formatDate(d));
+  const formattedHolidayDays = getHolidays(startDate, endDate).map((d) =>
+    formatDate(d)
+  );
 
   const [selectedCountry, setSelectedCountry] = useState("");
   const [manuallySelectedDays, setManuallySelectedDays] = useState([]);
@@ -216,14 +237,15 @@ function App() {
               Submit
             </button>
           </div>
-          <p>
-            {inputValue && (
-              <p>
-                Days left to select manually:{" "}
-                {parseInt(inputValue) - manuallySelectedDays.length}
-              </p>
-            )}
-          </p>
+          <p>Current rest days: {restDays}</p>
+
+          {inputValue && (
+            <p>
+              Days left to select manually:{" "}
+              {parseInt(inputValue) - manuallySelectedDays.length}
+            </p>
+          )}
+
           <div className="legend pt-3">
             <div className="legend-square">
               <span
